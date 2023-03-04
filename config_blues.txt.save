@@ -1,0 +1,78 @@
+# Example config file for the temperature control. Note: All devices running from this class must be registered here to be recognized by the loop!
+# Text in a line after the hash symbol is ignored
+# General convention: all properties are given as name/identifier: properties.
+# Code will attempt to parse all values as a float unless encapsulated in quotes for a string. If int conversion fails, will convert to string.
+# Equal sign separates parameter name from address
+# Each device class will specify its mandatory parameters. You can add others, probably to no effect
+# For devices that have meaningful channels, register them also in the channels section
+# Channel names can be same, device names must be unique
+
+Devices: #list all devices here that are connected
+#name				device_type 		IP_address or serial port
+
+"Keithley 1":   type = "Keithley", address = "192.168.001.023"
+"Keithley 2":   type = "Keithley", address = "192.168.001.016"
+"Blues Chiller": type = "Chiller", address = "/dev/ttyUSB0"
+"Rigol DP832A":  type = "rigol_dp832a", address = "192.168.1.27"
+
+
+Channels: #list active channels that we are interested in probing! Can comment out a channel to deactivate it without deleting its settings
+
+"Keithley 1"
+118:   name = "Blue probe fiber",	resistance_25C = 30000, beta = 3654, offset = 4
+119:   name = "Blue master", resistance_25C = 30000, beta =	3654, offset = 4
+120:   name = "Blues injection fiber", resistance_25C = 30000, beta = 3654, offset = 4
+
+"Keithley 2"
+101:    name = "XMOT Probe Retro Window", resistance_25C = 50000, beta = 3892, offset = 4
+102:    name = "XMOT Probe Retro Window", resistance_25C = 50000, beta = 3892, offset = 4
+103:    name = "MOT Coil N", resistance_25C = 50000, beta = 3892, offset = 4
+104:    name = "MOT Coil S", resistance_25C = 50000, beta = 3892, offset = 4
+105:    name = "XMOT Retro Window", resistance_25C = 50000, beta = 3892, offset = 4
+106:    name = "XMOT Retro Window", resistance_25C = 50000, beta = 3892, offset = 4
+107:    name = "6 Way Cross E", resistance_25C = 50000, beta = 3892, offset = 4
+108:    name = "6 Way Cross W", resistance_25C = 50000, beta = 3892, offset = 4
+109:    name = "X MOT Probe Input Window", resistance_25C = 50000, beta = 3892, offset = 4
+110:    name = "X MOT Probe Input Window", resistance_25C = 50000, beta = 3892, offset = 4
+111:    name = "X MOT Input Window", resistance_25C = 50000, beta = 3892, offset = 4
+112:    name = "X MOT Input Window", resistance_25C = 50000, beta = 3892, offset = 4
+113:    name = "Cavity Top Window", resistance_25C = 50000, beta = 3892, offset = 4
+114:    name = "Cavity Top Window", resistance_25C = 50000, beta = 3892, offset = 4
+115:    name = "Oven Valve", resistance_25C = 50000, beta = 3892, offset = 4
+116:	name = "Chamber HEPA", resistance_25C = 50000, beta = 3892, offset = 4
+117:    name = "Laser HEPA", resistance_25C = 50000, beta = 3892, offset = 4
+118:    name = "Lattice Fiber Top", resistance_25C = 50000, beta = 3892, offset = 4
+119:    name = "PMT Andor", resistance_25C = 50000, beta = 3892, offset = 4
+120:    name = "X MOT Retro Table", resistance_25C = 50000, beta = 3892, offset = 4
+201:    name = "Repump Box", resistance_25C = 50000, beta = 3892, offset = 4
+202:    name = "6 CF Window Front Left", resistance_25C = 50000, beta = 3892, offset = 4
+203:    name = "6 CF Window Front Right", resistance_25C = 50000, beta = 3892, offset = 4
+204:    name = "6 CF Window Back Left", resistance_25C = 50000, beta = 3892, offset = 4
+205:    name = "6 CF Window Back Right", resistance_25C = 50000, beta = 3892, offset = 4
+206:    name = "X Input Table", resistance_25C = 50000, beta = 3892, offset = 4
+207:    name = "TOP PDH PD Table", resistance_25C = 50000, beta = 3892, offset = 4
+208:    name = "Absorption Fiber Middle Table", resistance_25C = 50000, beta = 3892, offset = 4
+209:    name = "No Probe XArm Input Table", resistance_25C = 50000, beta = 3892, offset = 4
+210:    name = "Ion Pump", resistance_25C = 50000, beta = 3892, offset = 4
+211:    name = "Ion Pump Table", resistance_25C = 50000, beta = 3892, offset = 4
+212:    name = "813 Master", resistance_25C = 50000, beta = 3892, offset = 4
+213:	name = "Red Lasers", resistance_25C = 50000, beta = 3892, offset = 4
+214:    name = "Laser Table Partition", resistance_25C = 50000, beta = 3892, offset = 4
+215:    name = "813 Trans PD", resistance_25C = 50000, beta = 3892, offset = 4
+217:	name = "Chamber Yoke", resistance_25C = 50000, beta = 3892, offset = 4
+
+"Rigol DP832A"
+2:  name = "Chamber"
+3:  name = "Lasers"
+
+###
+
+Servos: #list all active servos. Can comment out a servo to deactivate it without deleting its settings
+#If you want to average several thermistors, include as a list: e.g. [101, 102, 103]
+#servo_name		keithley  thermistor_number(s)		output_device		setpoint	k_proportional	t_integrator	t_differentiator	output_min	output_max output_default
+"Sr1 blues":	input_device = "Keithley 1", input_channel = 119, output_device = "Blues chiller", setpoint = 22.0, k = 0.9, t_int = 200, t_diff = 0, output_min = 14, output_max = 30, output_default = 22
+
+#HEPA's use valves that actuate 1 V closed 5 V open.
+"Sr1 HEPA Chamber":		input_device = "Keithley 2", input_channel = 116, output_device =	"Rigol DP832A", output_channel =  2, setpoint = 23.5, k = -.3, t_int =	4
+0, t_diff =	0, output_min =	1.0, output_max =	5.0, output_default = 1.5
+"Sr1 HEPA Lasers":		input_device = "Keithley 2", input_channel = 117, output_device =	"Rigol DP832A", output_channel = 3,	setpoint = 22.0, k = -.3, t_int =	120, t_diff =	0, output_min =	1.0, output_max =	5.0, output_default = 1.5
