@@ -35,8 +35,10 @@ def index():
                 <script>
                     $(document).ready(function() {
                         setInterval(function() {
+                            var width = $(window).width();
+                            var height = $(window).height();
                             $.ajax({
-                                url: "/plot",
+                                url: "/plot?width=" + width + "&height=" + height,
                                 success: function(data) {
                                     $('#plot').attr('src', 'data:image/png;base64,' + data);
                                 }
@@ -53,14 +55,12 @@ def index():
 
 @app.route("/plot")
 def plot():
-    # Generate the figure **without using pyplot**.
-    fig = Figure()
-    axes = fig.subplots(2, 3, figsize=(20, 12))
+
         # get the data path. 
     today = date_to_mjd(datetime.datetime.today().strftime(datetime_fmt))
     file_path = os.path.dirname(__file__)   
-    file_keithley_1 = os.path.join(file_path, 'Logging/keithley1/'+today+'.txt')
-    file_keithley_2 = os.path.join(file_path, 'Logging/keithley2/'+today+'.txt')
+    file_keithley_1 = os.path.join(file_path, "..", 'Logging/keithley1/'+today+'.txt')
+    file_keithley_2 = os.path.join(file_path, "..", 'Logging/keithley2/'+today+'.txt')
 
     channel_names_1 = ["nc00", "nc01", "nc02", "nc03",
                     "nc04", "nc05", "nc06", "nc07",
@@ -164,8 +164,9 @@ def plot():
         time_window = 200 # change this parameter to look at different time windows relative to the most recent point 
 
     # Main plot
-    fig, axes = plt.subplots(2, 3, figsize=(20, 12))
-
+    # Generate the figure **without using pyplot**.
+    fig = Figure(figsize=(18, 10))
+    axes = fig.subplots(2, 3)
     # Blues
     axes[0, 0].clear()
     axes[0, 0].plot((times_1 - times_1[0])[-time_window:]*24., temps_1['probe fiber'][-time_window:], '.', label='Probe Fiber', color=colors['Probe Fiber'])
@@ -213,20 +214,18 @@ def plot():
     axes[1, 1].grid()
     axes[1, 1].legend()
 
-
     # Notes 
     axes[-1, -1].clear()
     axes[-1, -1].annotate(
         "Today: "+str(datetime.datetime.today().strftime(datetime_fmt))+
         "\n last update: {}".format(str(datetime.datetime.now())) +
         "\n - x-axis starts from 0:00 a.m."+
-        "\n - For the close-up, go J/notebooks/[date]/plot_temps.ipynb"+
-        "\n - Running on Yebigbird"
-        , (0, 0.5))
+        "\n - For the close-up, go J/notebooks/[date]/plot_temps.ipynb",
+        (0, 0.5))
     axes[-1, -1].axis("off")
 
     fig.suptitle("Sr1 live temperature monitor")
-    fig.tight_layout()
+    # fig.tight_layout()
 
     # Save it to a temporary buffer.
     buf = BytesIO()
@@ -236,4 +235,4 @@ def plot():
     return data
 
 if __name__ == '__main__':
-    app.run(port=8000)
+    app.run(host="0.0.0.0", port=8000)
